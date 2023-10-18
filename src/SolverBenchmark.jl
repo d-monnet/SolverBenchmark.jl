@@ -45,4 +45,7 @@ include("profiles.jl")
 # PkgBenchmark benchmarks
 include("pkgbmark.jl")
 
+# tikz-export
+include("tikz_export.jl")
+
 end
