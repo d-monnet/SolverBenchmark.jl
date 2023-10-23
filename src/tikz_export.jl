@@ -8,14 +8,16 @@ function export_performance_profile_tikz(stats::Dict{Symbol, DataFrame},
   costs::Vector{<:Function},
   costnames::Vector{String},
   filename::String;
-  xlim=10,
-  ylim=10,
-  nxgrad=5,
-  nygrad=5,
-  markers = [],
-  colours = [],
-  linestyles = [],
-  linewidth = 1.0,
+  xlim::AbstractFloat=10,
+  ylim::AbstractFloat=10,
+  nxgrad::Int=5,
+  nygrad::Int=5,
+  markers::Vector{String} = [],
+  colours::Vector{String} = [],
+  linestyles::Vector{String} = [],
+  linewidth::Vector{String} = 1.0,
+  xlabels::String = [],
+  ylabels::String = [],
   kwargs...)
 
   logscale = true
@@ -41,9 +43,9 @@ function export_performance_profile_tikz(stats::Dict{Symbol, DataFrame},
   #isempty(markers) && ()
   
   x_mat, y_mat = SolverBenchmark.get_profile_solvers_data(stats,costs;kwargs...)
-  ylabel = "\\% of problem solved"
   for i in eachindex(costnames)
-    xlabel = "Cost: $(costnames[i])"
+    xlabel = isempty(xlabels) ? "Cost: $(costnames[i])" : xlabels[i]
+    ylabel = isempty(ylabels) ? "\\% of problem solved" : ylabels[i]
     xel = x_mat[i]
     xmax , _ = findmax(xel[.!isnan.(xel)])
     dist = xmax/(nxgrad-1)
@@ -55,8 +57,8 @@ function export_performance_profile_tikz(stats::Dict{Symbol, DataFrame},
       x_grad = Int.(x_grad)
     end
     x_grad[end] <= xmax || (pop!(x_grad))
-    xratio = xlim/xmax
-    yratio = ylim/ymax
+    xratio = xlim*0.9/xmax
+    yratio = ylim*0.9/ymax
     open(filename*"_$(costnames[i]).tex", "w") do io
       println(io, "\\begin{tikzpicture}")
       # axes
